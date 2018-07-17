@@ -335,9 +335,10 @@ public class ApplovinAdapter
                 + mZoneId + " and placement: " + mPlacement);
 
         // Convert requested size to AppLovin Ad Size.
-        if (appLovinAdSize != null) {
-            mAdView = new AppLovinAdView(mSdk, appLovinAdSize, context);
         final AppLovinAdSize appLovinAdSize = AppLovinUtils.appLovinAdSizeFromAdMobAdSize( adSize );
+        if ( appLovinAdSize != null )
+        {
+            mAdView = new AppLovinAdView( mSdk, appLovinAdSize, context );
 
             final AppLovinBannerAdListener listener = new AppLovinBannerAdListener(
                     mZoneId, mPlacement, mAdView, this, mediationBannerListener);
