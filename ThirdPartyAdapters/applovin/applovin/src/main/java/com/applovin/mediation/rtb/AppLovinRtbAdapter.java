@@ -1,15 +1,12 @@
 package com.applovin.mediation.rtb;
 
 import android.app.Application;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.applovin.mediation.AppLovinUtils;
 import com.applovin.sdk.AppLovinSdk;
-import com.applovin.sdk.AppLovinSdkUtils;
 import com.google.ads.mediation.sample.adapter.BuildConfig;
-import com.google.ads.mediation.sample.adapter.rtb.SampleRtbBannerRenderer;
-import com.google.ads.mediation.sample.adapter.rtb.SampleRtbInterstitialRenderer;
-import com.google.ads.mediation.sample.adapter.rtb.SampleRtbRewardedRenderer;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.mediation.rtb.AdRenderingCallback;
 import com.google.android.gms.ads.mediation.rtb.BannerAd;
@@ -80,22 +77,28 @@ public class AppLovinRtbAdapter
     }
 
     @Override
-    public void collectSignals(final RtbSignalData rtbSignalData, final SignalCallbacks signalCallbacks)
+    public void collectSignals(RtbSignalData rtbSignalData, SignalCallbacks signalCallbacks)
     {
         // TODO: I hope that we do not use the SDK Key and Context from here to initialize SDK / get bid token with...
         // Check if the publisher provided extra parameters
         if ( rtbSignalData.extras != null )
         {
-            Log.i( TAG, "Extras that adapter gets: " + rtbSignalData.extras );
+            Log.i( TAG, "Extras for signal collection: " + rtbSignalData.extras );
         }
-
 
         AppLovinSdk sdk = AppLovinUtils.retrieveSdk( rtbSignalData.extras, rtbSignalData.context );
         String bidToken = sdk.getAdService().getBidToken();
 
-        Log.i( TAG, "Generated bid token: " + bidToken );
-
-        signalCallbacks.onSuccess( bidToken );
+        if ( !TextUtils.isEmpty( bidToken ) )
+        {
+            Log.i( TAG, "Generated bid token: " + bidToken );
+            signalCallbacks.onSuccess( bidToken );
+        }
+        else
+        {
+            Log.e( TAG, "Failed to generate bid token" );
+            signalCallbacks.onFailure( null );
+        }
     }
 
     @Override
@@ -106,34 +109,14 @@ public class AppLovinRtbAdapter
     }
 
     @Override
-    public void renderInterstitialAd(
-            RtbAdConfiguration adConfiguration,
-            AdRenderingCallback<InterstitialAd, InterstitialEventListener> callback)
+    public void renderInterstitialAd(RtbAdConfiguration adConfiguration, AdRenderingCallback<InterstitialAd, InterstitialEventListener> callback)
     {
-        Log.e( "Test", "renderInterstitial" );
-        Log.e( "Test", "Bid Response: " + adConfiguration.bidResponse );
-        if ( adConfiguration.mediationExtras != null )
-        {
-            Log.e( "Test", "Extras that renderInterstitial gets: " + adConfiguration.mediationExtras.toString() );
-        }
-        SampleRtbInterstitialRenderer interstitialRenderer =
-                new SampleRtbInterstitialRenderer( adConfiguration, callback );
-        interstitialRenderer.render();
+
     }
 
     @Override
-    public void renderRewardedAd(
-            RtbAdConfiguration adConfiguration,
-            AdRenderingCallback<RewardedAd, RewardedEventListener> callback)
+    public void renderRewardedAd(RtbAdConfiguration adConfiguration, AdRenderingCallback<RewardedAd, RewardedEventListener> callback)
     {
-        Log.e( "Test", "renderRewarded" );
-        Log.e( "Test", "Bid Response: " + adConfiguration.bidResponse );
-        if ( adConfiguration.mediationExtras != null )
-        {
-            Log.e( "Test", "Extras that renderRewarded gets: " + adConfiguration.mediationExtras.toString() );
-        }
-        SampleRtbRewardedRenderer rewardedRenderer =
-                new SampleRtbRewardedRenderer( adConfiguration, callback );
-        rewardedRenderer.render();
+
     }
 }
