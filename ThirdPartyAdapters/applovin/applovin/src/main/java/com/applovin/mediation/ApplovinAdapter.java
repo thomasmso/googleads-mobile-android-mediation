@@ -43,10 +43,7 @@ public class ApplovinAdapter
         implements MediationBannerAdapter, MediationInterstitialAdapter,
         MediationRewardedVideoAdAdapter, OnContextChangedListener {
     private static final boolean LOGGING_ENABLED = true;
-    private static final String DEFAULT_ZONE = "";
-
-    private static final int BANNER_STANDARD_HEIGHT         = 50;
-    private static final int BANNER_HEIGHT_OFFSET_TOLERANCE = 10;
+    private static final String  DEFAULT_ZONE    = "";
 
     // Interstitial globals.
     private static final HashMap<String, Queue<AppLovinAd>> INTERSTITIAL_AD_QUEUES =
@@ -338,9 +335,9 @@ public class ApplovinAdapter
                 + mZoneId + " and placement: " + mPlacement);
 
         // Convert requested size to AppLovin Ad Size.
-        final AppLovinAdSize appLovinAdSize = appLovinAdSizeFromAdMobAdSize(adSize);
         if (appLovinAdSize != null) {
             mAdView = new AppLovinAdView(mSdk, appLovinAdSize, context);
+        final AppLovinAdSize appLovinAdSize = AppLovinUtils.appLovinAdSizeFromAdMobAdSize( adSize );
 
             final AppLovinBannerAdListener listener = new AppLovinBannerAdListener(
                     mZoneId, mPlacement, mAdView, this, mediationBannerListener);
@@ -371,27 +368,6 @@ public class ApplovinAdapter
         return mAdView;
     }
     //endregion
-
-    private AppLovinAdSize appLovinAdSizeFromAdMobAdSize(AdSize adSize) {
-        final boolean isSmartBanner = (adSize.getWidth() == AdSize.FULL_WIDTH) &&
-                (adSize.getHeight() == AdSize.AUTO_HEIGHT);
-
-        if (AdSize.BANNER.equals(adSize) || AdSize.LARGE_BANNER.equals(adSize) || isSmartBanner) {
-            return AppLovinAdSize.BANNER;
-        } else if (AdSize.MEDIUM_RECTANGLE.equals(adSize)) {
-            return AppLovinAdSize.MREC;
-        } else if (AdSize.LEADERBOARD.equals(adSize)) {
-            return AppLovinAdSize.LEADER;
-        }
-
-        // Assume fluid width, and check for height with offset tolerance
-        final int offset = Math.abs( BANNER_STANDARD_HEIGHT - adSize.getHeight() );
-        if (offset <= BANNER_HEIGHT_OFFSET_TOLERANCE)  {
-            return AppLovinAdSize.BANNER;
-        }
-
-        return null;
-    }
 
     //region MediationAdapter.
     @Override

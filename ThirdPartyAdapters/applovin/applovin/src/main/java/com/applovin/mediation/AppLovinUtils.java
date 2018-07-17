@@ -4,17 +4,24 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinErrorCodes;
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkSettings;
+import com.applovin.sdk.BuildConfig;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 
 /*
  * A helper class used by {@link AppLovinAdapter}.
  */
-class AppLovinUtils {
+public class AppLovinUtils
+{
     private static final String DEFAULT_ZONE = "";
+
+    private static final int BANNER_STANDARD_HEIGHT         = 50;
+    private static final int BANNER_HEIGHT_OFFSET_TOLERANCE = 10;
 
     /**
      * Keys for retrieving values from the server parameters.
@@ -29,8 +36,9 @@ class AppLovinUtils {
      * Retrieves the appropriate instance of AppLovin's SDK from the SDK key given in the server
      * parameters, or Android Manifest.
      */
-    static AppLovinSdk retrieveSdk(Bundle serverParameters, Context context) {
-        final String sdkKey = serverParameters.getString(ServerParameterKeys.SDK_KEY);
+    public static AppLovinSdk retrieveSdk(Bundle serverParameters, Context context)
+    {
+        final String sdkKey = (serverParameters != null) ? serverParameters.getString( ServerParameterKeys.SDK_KEY ) : null;
         final AppLovinSdk sdk;
 
         if (!TextUtils.isEmpty(sdkKey)) {
@@ -92,5 +100,36 @@ class AppLovinUtils {
         } else {
             return AdRequest.ERROR_CODE_INTERNAL_ERROR;
         }
+    }
+
+    /**
+     * Get the {@link AppLovinAdSize} from a given {@link AdSize} from AdMob.
+     */
+    public static AppLovinAdSize appLovinAdSizeFromAdMobAdSize(AdSize adSize)
+    {
+        final boolean isSmartBanner = ( adSize.getWidth() == AdSize.FULL_WIDTH ) &&
+                ( adSize.getHeight() == AdSize.AUTO_HEIGHT );
+
+        if ( AdSize.BANNER.equals( adSize ) || AdSize.LARGE_BANNER.equals( adSize ) || isSmartBanner )
+        {
+            return AppLovinAdSize.BANNER;
+        }
+        else if ( AdSize.MEDIUM_RECTANGLE.equals( adSize ) )
+        {
+            return AppLovinAdSize.MREC;
+        }
+        else if ( AdSize.LEADERBOARD.equals( adSize ) )
+        {
+            return AppLovinAdSize.LEADER;
+        }
+
+        // Assume fluid width, and check for height with offset tolerance
+        final int offset = Math.abs( BANNER_STANDARD_HEIGHT - adSize.getHeight() );
+        if ( offset <= BANNER_HEIGHT_OFFSET_TOLERANCE )
+        {
+            return AppLovinAdSize.BANNER;
+        }
+
+        return null;
     }
 }
