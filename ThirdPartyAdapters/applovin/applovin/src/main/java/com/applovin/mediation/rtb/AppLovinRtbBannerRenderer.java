@@ -23,10 +23,10 @@ import com.google.android.gms.ads.mediation.rtb.RtbAdConfiguration;
 /**
  * Created by Thomas So on July 17 2018
  */
-public final class AppLovinBannerRenderer
+public final class AppLovinRtbBannerRenderer
         implements BannerAd, AppLovinAdLoadListener, AppLovinAdDisplayListener, AppLovinAdClickListener, AppLovinAdViewEventListener
 {
-    private static final String TAG = "AppLovinBannerRenderer";
+    private static final String TAG = "AppLovinRtbBannerRenderer";
 
     /**
      * Data used to render an RTB banner ad.
@@ -47,9 +47,9 @@ public final class AppLovinBannerRenderer
     private final AppLovinAdSize adSize;
     private       AppLovinAdView adView;
 
-    public AppLovinBannerRenderer(RtbAdConfiguration adConfiguration,
-                                  AdSize adSize,
-                                  AdRenderingCallback<BannerAd, BannerEventListener> callback)
+    public AppLovinRtbBannerRenderer(RtbAdConfiguration adConfiguration,
+                                     AdSize adSize,
+                                     AdRenderingCallback<BannerAd, BannerEventListener> callback)
     {
         this.adConfiguration = adConfiguration;
         this.callback = callback;
@@ -63,10 +63,13 @@ public final class AppLovinBannerRenderer
     {
         if ( adSize != null )
         {
+            // Create adview object
             adView = new AppLovinAdView( sdk, adSize, adConfiguration.context );
             adView.setAdDisplayListener( this );
             adView.setAdClickListener( this );
             adView.setAdViewEventListener( this );
+
+            // Load ad!
             sdk.getAdService().loadNextAdForAdToken( adConfiguration.bidResponse, this );
         }
         else
@@ -88,7 +91,7 @@ public final class AppLovinBannerRenderer
     {
         Log.d( TAG, "Banner did load ad: " + ad.getAdIdNumber() );
 
-        listener = callback.onSuccess( AppLovinBannerRenderer.this );
+        listener = callback.onSuccess( AppLovinRtbBannerRenderer.this );
 
         adView.renderAd( ad );
     }

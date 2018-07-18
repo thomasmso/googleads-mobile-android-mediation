@@ -30,14 +30,14 @@ import java.util.List;
 public class AppLovinRtbAdapter
         extends RtbAdapter
 {
-    private static final String TAG = AppLovinRtbAdapter.class.getSimpleName();
+    private static final String TAG = "AppLovinRtbAdapter";
 
+    // TODO: Why is this not in the base adapter?!
     // @Override
-    // Why is this not in the base adapter
-    public void setUp()
-    {
-        AppLovinSdk.getInstance( new Application() ).initializeSdk();
-    }
+    // public void setUp()
+    // {
+    // AppLovinSdk.getInstance( new Application() ).initializeSdk();
+    // }
 
     @Override
     public void initialize()
@@ -104,20 +104,21 @@ public class AppLovinRtbAdapter
     @Override
     public void renderBannerAd(RtbAdConfiguration adConfiguration, AdSize adSize, AdRenderingCallback<BannerAd, BannerEventListener> callback)
     {
-        AppLovinBannerRenderer bannerRenderer = new AppLovinBannerRenderer( adConfiguration, adSize, callback );
+        AppLovinRtbBannerRenderer bannerRenderer = new AppLovinRtbBannerRenderer( adConfiguration, adSize, callback );
         bannerRenderer.loadAd();
     }
 
     @Override
     public void renderInterstitialAd(RtbAdConfiguration adConfiguration, AdRenderingCallback<InterstitialAd, InterstitialEventListener> callback)
     {
-        AppLovinInterstitialRenderer interstitialRenderer = new AppLovinInterstitialRenderer( adConfiguration, callback );
+        AppLovinRtbInterstitialRenderer interstitialRenderer = new AppLovinRtbInterstitialRenderer( adConfiguration, callback );
         interstitialRenderer.loadAd();
     }
 
     @Override
     public void renderRewardedAd(RtbAdConfiguration adConfiguration, AdRenderingCallback<RewardedAd, RewardedEventListener> callback)
     {
-
+        AppLovinRtbRewardedRenderer rewardedRenderer = new AppLovinRtbRewardedRenderer( adConfiguration, callback );
+        rewardedRenderer.loadAd();
     }
 }

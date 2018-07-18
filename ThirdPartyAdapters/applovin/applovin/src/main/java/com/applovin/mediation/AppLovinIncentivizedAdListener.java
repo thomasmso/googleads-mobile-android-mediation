@@ -116,28 +116,4 @@ class AppLovinIncentivizedAdListener
         ApplovinAdapter.log(DEBUG, "Rewarded " + amount + " " + currency);
         mRewardItem = new AppLovinRewardItem(amount, currency);
     }
-
-    /**
-     * Reward item wrapper class.
-     */
-    private static final class AppLovinRewardItem
-            implements RewardItem {
-        private final int mAmount;
-        private final String mType;
-
-        private AppLovinRewardItem(int amount, final String type) {
-            mAmount = amount;
-            mType = type;
-        }
-
-        @Override
-        public String getType() {
-            return mType;
-        }
-
-        @Override
-        public int getAmount() {
-            return mAmount;
-        }
-    }
 }

@@ -19,10 +19,10 @@ import com.google.android.gms.ads.mediation.rtb.RtbAdConfiguration;
 /**
  * Created by Thomas So on July 17 2018
  */
-public final class AppLovinInterstitialRenderer
+public final class AppLovinRtbInterstitialRenderer
         implements InterstitialAd, AppLovinAdLoadListener, AppLovinAdDisplayListener, AppLovinAdClickListener, AppLovinAdVideoPlaybackListener
 {
-    private static final String TAG = "AppLovinInterRenderer";
+    private static final String TAG = "AppLovinRtbInterstitialRenderer";
 
     /**
      * Data used to render an RTB interstitial ad.
@@ -39,11 +39,11 @@ public final class AppLovinInterstitialRenderer
      */
     private InterstitialEventListener listener;
 
+    private final AppLovinSdk                  sdk;
+    private       AppLovinInterstitialAdDialog interstitialAd;
+    private       AppLovinAd                   ad;
 
-    private final AppLovinSdk sdk;
-    private       AppLovinAd  ad;
-
-    public AppLovinInterstitialRenderer(RtbAdConfiguration adConfiguration, AdRenderingCallback<InterstitialAd, InterstitialEventListener> callback)
+    public AppLovinRtbInterstitialRenderer(RtbAdConfiguration adConfiguration, AdRenderingCallback<InterstitialAd, InterstitialEventListener> callback)
     {
         this.adConfiguration = adConfiguration;
         this.callback = callback;
@@ -53,6 +53,13 @@ public final class AppLovinInterstitialRenderer
 
     public void loadAd()
     {
+        // Create interstitial object
+        interstitialAd = AppLovinInterstitialAd.create( sdk, adConfiguration.context );
+        interstitialAd.setAdDisplayListener( this );
+        interstitialAd.setAdClickListener( this );
+        interstitialAd.setAdVideoPlaybackListener( this );
+
+        // Load ad!
         sdk.getAdService().loadNextAdForAdToken( adConfiguration.bidResponse, this );
     }
 
@@ -63,10 +70,6 @@ public final class AppLovinInterstitialRenderer
         boolean muted = AppLovinUtils.shouldMuteAudio( adConfiguration.mediationExtras );
         sdk.getSettings().setMuted( muted );
 
-        final AppLovinInterstitialAdDialog interstitialAd = AppLovinInterstitialAd.create( sdk, adConfiguration.context );
-        interstitialAd.setAdDisplayListener( this );
-        interstitialAd.setAdClickListener( this );
-        interstitialAd.setAdVideoPlaybackListener( this );
         interstitialAd.showAndRender( ad );
     }
 
@@ -78,7 +81,7 @@ public final class AppLovinInterstitialRenderer
 
         this.ad = ad;
 
-        listener = callback.onSuccess( AppLovinInterstitialRenderer.this );
+        listener = callback.onSuccess( AppLovinRtbInterstitialRenderer.this );
     }
 
     @Override
