@@ -59,7 +59,7 @@ public final class AppLovinBannerRenderer
         this.sdk = AppLovinUtils.retrieveSdk( adConfiguration.serverParameters, adConfiguration.context );
     }
 
-    public void render()
+    public void loadAd()
     {
         if ( adSize != null )
         {

@@ -105,14 +105,14 @@ public class AppLovinRtbAdapter
     public void renderBannerAd(RtbAdConfiguration adConfiguration, AdSize adSize, AdRenderingCallback<BannerAd, BannerEventListener> callback)
     {
         AppLovinBannerRenderer bannerRenderer = new AppLovinBannerRenderer( adConfiguration, adSize, callback );
-        bannerRenderer.render();
+        bannerRenderer.loadAd();
     }
 
     @Override
     public void renderInterstitialAd(RtbAdConfiguration adConfiguration, AdRenderingCallback<InterstitialAd, InterstitialEventListener> callback)
     {
         AppLovinInterstitialRenderer interstitialRenderer = new AppLovinInterstitialRenderer( adConfiguration, callback );
-        interstitialRenderer.render();
+        interstitialRenderer.loadAd();
     }
 
     @Override

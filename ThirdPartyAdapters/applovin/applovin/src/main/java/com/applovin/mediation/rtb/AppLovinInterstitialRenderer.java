@@ -51,8 +51,7 @@ public final class AppLovinInterstitialRenderer
         this.sdk = AppLovinUtils.retrieveSdk( adConfiguration.serverParameters, adConfiguration.context );
     }
 
-    // TODO: Rename
-    public void render()
+    public void loadAd()
     {
         sdk.getAdService().loadNextAdForAdToken( adConfiguration.bidResponse, this );
     }
