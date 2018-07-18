@@ -81,14 +81,16 @@ public class AppLovinUtils
     /**
      * Retrieves whether or not to mute the ad that is about to be rendered.
      */
-    static boolean shouldMuteAudio(Bundle networkExtras) {
-        return networkExtras != null && networkExtras.getBoolean(AppLovinExtras.Keys.MUTE_AUDIO);
+    public static boolean shouldMuteAudio(Bundle networkExtras)
+    {
+        return networkExtras != null && networkExtras.getBoolean( AppLovinExtras.Keys.MUTE_AUDIO );
     }
 
     /**
      * Convert the given AppLovin SDK error code into the appropriate AdMob error code.
      */
-    static int toAdMobErrorCode(int applovinErrorCode) {
+    public static int toAdMobErrorCode(int applovinErrorCode)
+    {
         //
         // TODO: Be more exhaustive
         //
