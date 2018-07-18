@@ -96,8 +96,9 @@ public class AppLovinRtbAdapter
         }
         else
         {
-            Log.e( TAG, "Failed to generate bid token" );
-            signalCallbacks.onFailure( null );
+            String errorMessage = "Failed to generate bid token";
+            Log.e( TAG, errorMessage );
+            signalCallbacks.onFailure( errorMessage );
         }
     }
 
