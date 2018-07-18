@@ -68,6 +68,10 @@ public final class AppLovinRtbRewardedRenderer
     @Override
     public void showAd()
     {
+        // Update mute state
+        boolean muted = AppLovinUtils.shouldMuteAudio( adConfiguration.mediationExtras );
+        sdk.getSettings().setMuted( muted );
+
         incentivizedInterstitial.show( ad, adConfiguration.context, this, this, this, this );
     }
 
