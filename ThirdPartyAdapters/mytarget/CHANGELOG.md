@@ -1,4 +1,20 @@
 # myTarget Adapter for Google Mobile Ads SDK for Android Changelog
+
+## 5.1.1.0
+- Verified compatibility with myTarget SDK version 5.1.1.
+
+## 5.1.0.1
+- Updated Adapter to use the Unified Native Ads adapter API.
+
+## 5.1.0.0
+- Verified compatibility with myTarget SDK version 5.1.0.
+
+## 5.0.4.0
+- Verified compatibility with myTarget SDK version 5.0.4.
+
+## 5.0.2.1
+- Updated the adapter to make it compatible with Google Mobile Ads SDK version 15.0.0.
+
 ## 5.0.2.0
 - Verified compatibility with myTarget SDK version 5.0.2.
 
