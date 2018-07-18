@@ -111,7 +111,8 @@ public class AppLovinRtbAdapter
     @Override
     public void renderInterstitialAd(RtbAdConfiguration adConfiguration, AdRenderingCallback<InterstitialAd, InterstitialEventListener> callback)
     {
-
+        AppLovinInterstitialRenderer interstitialRenderer = new AppLovinInterstitialRenderer( adConfiguration, callback );
+        interstitialRenderer.render();
     }
 
     @Override
