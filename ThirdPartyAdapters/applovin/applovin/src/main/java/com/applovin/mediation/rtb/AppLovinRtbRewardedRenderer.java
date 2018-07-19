@@ -98,7 +98,7 @@ public final class AppLovinRtbRewardedRenderer
     @Override
     public void adDisplayed(AppLovinAd ad)
     {
-        Log.d( TAG, "Rewarded video dismissed" );
+        Log.d( TAG, "Rewarded video displayed" );
         listener.reportAdImpression();
     }
 

@@ -96,7 +96,7 @@ public final class AppLovinRtbInterstitialRenderer
     @Override
     public void adDisplayed(AppLovinAd ad)
     {
-        Log.d( TAG, "Interstitial dismissed" );
+        Log.d( TAG, "Interstitial displayed" );
         listener.reportAdImpression();
     }
 

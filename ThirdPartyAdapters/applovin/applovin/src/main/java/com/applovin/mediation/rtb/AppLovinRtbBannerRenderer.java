@@ -108,7 +108,7 @@ public final class AppLovinRtbBannerRenderer
     @Override
     public void adDisplayed(AppLovinAd ad)
     {
-        Log.d( TAG, "Banner dismissed" );
+        Log.d( TAG, "Banner displayed" );
         listener.reportAdImpression();
     }
 
