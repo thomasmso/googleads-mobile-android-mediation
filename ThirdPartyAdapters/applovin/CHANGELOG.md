@@ -1,5 +1,14 @@
 # AppLovin Adapter for Google Mobile Ads SDK for Android
 
+## 8.1.4.0
+- Verified compatibility with AppLovin SDK 8.1.4
+
+## 8.1.3.0
+- Verified compatibility with AppLovin SDK 8.1.3
+
+## 8.1.0.0
+- Verified compatibility with AppLovin SDK 8.1.0
+
 ## 8.0.2.1
 - Updated the adapter to invoke the `onRewardedVideoComplete()` ad event.
 
