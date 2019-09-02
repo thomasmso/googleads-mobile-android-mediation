@@ -7,8 +7,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -573,20 +573,9 @@ public class MyTargetNativeAdapter implements MediationNativeAdapter {
         }
 
         @Override
-        public void onLoad(@NonNull final NativeAd nativeAd) {
+        public void onLoad(@NonNull NativePromoBanner banner, @NonNull NativeAd nativeAd) {
 
-            NativePromoBanner banner = nativeAd.getBanner();
-            if (banner == null) {
-                Log.d(TAG, "No ad: MyTarget responded with null banner");
-                if (customEventNativeListener != null) {
-                    customEventNativeListener
-                            .onAdFailedToLoad(MyTargetNativeAdapter.this,
-                                    AdRequest.ERROR_CODE_NO_FILL);
-                }
-                return;
-            }
-
-            if (this.nativeAd != nativeAd) {
+			if (this.nativeAd != nativeAd) {
                 Log.d(TAG, "Failed to load: loaded native ad does not match with requested");
                 if (customEventNativeListener != null) {
                     customEventNativeListener.onAdFailedToLoad(

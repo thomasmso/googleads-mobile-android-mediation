@@ -2,8 +2,8 @@ package com.google.ads.mediation.mytarget;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
@@ -276,6 +276,12 @@ public class MyTargetAdapter extends MyTargetMediationAdapter
         public void onNoAd(@NonNull final String reason, @NonNull final MyTargetView view) {
              Log.i(TAG, "Banner mediation Ad failed to load: " + reason);
              listener.onAdFailedToLoad(MyTargetAdapter.this, AdRequest.ERROR_CODE_NO_FILL);
+        }
+
+        @Override
+        public void onShow(@NonNull MyTargetView view)
+        {
+            Log.d(TAG, "Banner mediation Ad show");
         }
 
         @Override

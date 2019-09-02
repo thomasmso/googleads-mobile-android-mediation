@@ -17,7 +17,7 @@ package com.google.ads.mediation.unity;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Keep;
+import androidx.annotation.Keep;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -69,12 +69,12 @@ public class UnityAdapter extends UnityMediationAdapter
      * Callback object for Google's Banner Lifecycle.
      */
     private MediationBannerListener bannerListener;
-
+    
     /**
      * Unity adapter delegate to to forward the events from {@link UnitySingleton} to Google Mobile
      * Ads SDK.
      */
-    private UnityAdapterDelegate mUnityAdapterDelegate = new UnityAdapterDelegate() {
+    private final UnityAdapterDelegate mUnityAdapterDelegate = new UnityAdapterDelegate() {
 
         @Override
         public String getPlacementId() {
@@ -143,7 +143,7 @@ public class UnityAdapter extends UnityMediationAdapter
         }
     };
 
-    private UnityAdapterBannerDelegate bannerDelegate = new UnityAdapterBannerDelegate() {
+    private final UnityAdapterBannerDelegate bannerDelegate = new UnityAdapterBannerDelegate() {
         @Override
         public String getPlacementId() {
             return bannerPlacementId;
@@ -309,14 +309,15 @@ public class UnityAdapter extends UnityMediationAdapter
                                 MediationAdRequest adRequest,
                                 Bundle mediationExtras) {
         bannerListener = listener;
+
         AdSize supportedSize = getSupportedAdSize(context, adSize);
         if (supportedSize == null) {
-          Log.e(TAG, "Invalid ad size requested: " + adSize);
-          if (bannerListener != null) {
-              bannerListener.onAdFailedToLoad(UnityAdapter.this,
-                      AdRequest.ERROR_CODE_INVALID_REQUEST);
-          }
-          return;
+            Log.e(TAG, "Invalid ad size requested: " + adSize);
+            if (bannerListener != null) {
+                bannerListener.onAdFailedToLoad(UnityAdapter.this,
+                        AdRequest.ERROR_CODE_INVALID_REQUEST);
+            }
+            return;
         }
 
         String gameId = serverParameters.getString(KEY_GAME_ID);
@@ -395,6 +396,7 @@ public class UnityAdapter extends UnityMediationAdapter
         if (potential == null) {
           return false;
         }
+
         double minWidthRatio = 0.5;
         double minHeightRatio = 0.7;
 
@@ -412,6 +414,7 @@ public class UnityAdapter extends UnityMediationAdapter
             originalHeight < potentialHeight) {
             return false;
         }
+
         return true;
     }
 

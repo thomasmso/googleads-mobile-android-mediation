@@ -1,7 +1,7 @@
 package com.google.ads.mediation.mopub;
 
-import android.app.Activity;
-import android.support.annotation.NonNull;
+import android.content.Context;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class MoPubSingleton implements MoPubRewardedVideoListener {
@@ -70,10 +69,11 @@ public class MoPubSingleton implements MoPubRewardedVideoListener {
         }
     }
 
-    public void initializeMoPubSDK(Activity activity,
+    public void initializeMoPubSDK(Context context,
                                    SdkConfiguration configuration,
                                    SdkInitializationListener listener) {
         if (MoPub.isSdkInitialized()) {
+            MoPubRewardedVideos.setRewardedVideoListener(MoPubSingleton.this);
             listener.onInitializationFinished();
             return;
         }
@@ -82,7 +82,7 @@ public class MoPubSingleton implements MoPubRewardedVideoListener {
         if (!isInitializing) {
             isInitializing = true;
 
-            MoPub.initializeSdk(activity, configuration, new SdkInitializationListener() {
+            MoPub.initializeSdk(context, configuration, new SdkInitializationListener() {
                 @Override
                 public void onInitializationFinished() {
                     MoPubLog.d("MoPub SDK initialized.");
@@ -92,12 +92,13 @@ public class MoPubSingleton implements MoPubRewardedVideoListener {
                         initListener.onInitializationFinished();
                     }
                     mInitListeners.clear();
+                    isInitializing = false;
                 }
             });
         }
     }
 
-    public void loadRewardedAd(Activity activity,
+    public void loadRewardedAd(Context context,
                                final String adUnitID,
                                final MoPubRewardedVideoManager.RequestParameters requestParameters,
                                final MoPubRewardedVideoListener listener) {
@@ -111,7 +112,7 @@ public class MoPubSingleton implements MoPubRewardedVideoListener {
         mListeners.put(adUnitID, new WeakReference<>(listener));
 
         SdkConfiguration configuration = new SdkConfiguration.Builder(adUnitID).build();
-        initializeMoPubSDK(activity, configuration, new SdkInitializationListener() {
+        initializeMoPubSDK(context, configuration, new SdkInitializationListener() {
             @Override
             public void onInitializationFinished() {
                 MoPubRewardedVideos.loadRewardedVideo(adUnitID, requestParameters);
