@@ -16,52 +16,57 @@
 
 package com.google.ads.mediation.sample.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-import androidx.annotation.Keep;
-import android.text.TextUtils;
+import android.support.annotation.Keep;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-
 import com.google.ads.mediation.sample.sdk.SampleAdRequest;
 import com.google.ads.mediation.sample.sdk.SampleAdSize;
 import com.google.ads.mediation.sample.sdk.SampleAdView;
 import com.google.ads.mediation.sample.sdk.SampleInterstitial;
 import com.google.ads.mediation.sample.sdk.SampleNativeAdLoader;
 import com.google.ads.mediation.sample.sdk.SampleNativeAdRequest;
-import com.google.ads.mediation.sample.sdk.SampleRewardedVideo;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.formats.NativeAdOptions;
+import com.google.android.gms.ads.mediation.Adapter;
+import com.google.android.gms.ads.mediation.InitializationCompleteCallback;
+import com.google.android.gms.ads.mediation.MediationAdLoadCallback;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
 import com.google.android.gms.ads.mediation.MediationBannerAdapter;
 import com.google.android.gms.ads.mediation.MediationBannerListener;
+import com.google.android.gms.ads.mediation.MediationConfiguration;
 import com.google.android.gms.ads.mediation.MediationInterstitialAdapter;
 import com.google.android.gms.ads.mediation.MediationInterstitialListener;
 import com.google.android.gms.ads.mediation.MediationNativeAdapter;
 import com.google.android.gms.ads.mediation.MediationNativeListener;
+import com.google.android.gms.ads.mediation.MediationRewardedAd;
+import com.google.android.gms.ads.mediation.MediationRewardedAdCallback;
+import com.google.android.gms.ads.mediation.MediationRewardedAdConfiguration;
 import com.google.android.gms.ads.mediation.NativeMediationAdRequest;
-import com.google.android.gms.ads.mediation.OnContextChangedListener;
-import com.google.android.gms.ads.reward.mediation.MediationRewardedVideoAdAdapter;
-import com.google.android.gms.ads.reward.mediation.MediationRewardedVideoAdListener;
+import com.google.android.gms.ads.mediation.VersionInfo;
+import java.util.List;
 
 /**
  * A mediation adapter for the Sample ad network. This class can be used as a reference to help
  * other ad networks build their own mediation adapter.
- * <p/>
- * NOTE: The audience for this sample is mediation ad networks who are trying to build an ad network
- * adapter, not an app developer trying to integrate Google Mobile Ads into their application.
- * <p/>
- * Since the adapter is not directly referenced by the Google Mobile Ads SDK and is instead
+ *
+ * <p>NOTE: The audience for this sample is mediation ad networks who are trying to build an ad
+ * network adapter, not an app developer trying to integrate Google Mobile Ads into their
+ * application.
+ *
+ * <p>Since the adapter is not directly referenced by the Google Mobile Ads SDK and is instead
  * instantiated with reflection, it's possible that ProGuard might remove it. Use the {@link Keep}}
  * annotation to make sure that the adapter is not removed when minifying the project.
  */
 @Keep
-public class SampleAdapter implements MediationBannerAdapter, MediationInterstitialAdapter,
-        MediationNativeAdapter, MediationRewardedVideoAdAdapter, OnContextChangedListener {
+public class SampleAdapter extends Adapter
+        implements MediationBannerAdapter,
+        MediationInterstitialAdapter,
+        MediationNativeAdapter {
     protected static final String TAG = SampleAdapter.class.getSimpleName();
 
     /**
@@ -103,21 +108,12 @@ public class SampleAdapter implements MediationBannerAdapter, MediationInterstit
     private SampleInterstitial sampleInterstitial;
 
     /**
-     * Used to forward rewarded video ad events to AdMob.
-     */
-    private SampleMediationRewardedVideoEventForwarder rewardedVideoEventForwarder;
-
-    /**
      * The adapter is being destroyed. Perform any necessary cleanup here.
      */
     @Override
     public void onDestroy() {
         if (sampleAdView != null) {
             sampleAdView.destroy();
-        }
-
-        if (rewardedVideoEventForwarder != null) {
-            SampleRewardedVideo.destroy();
         }
     }
 
@@ -372,80 +368,58 @@ public class SampleAdapter implements MediationBannerAdapter, MediationInterstit
     }
 
     @Override
-    public void initialize(Context context,
-                           MediationAdRequest mediationAdRequest,
-                           String unUsed,
-                           MediationRewardedVideoAdListener listener,
-                           Bundle serverParameters,
-                           Bundle mediationExtras) {
-
-        // In this method you should initialize your SDK.
-
-        // The sample SDK requires activity context to initialize, so check that the context
-        // provided by the app is an activity context before initializing.
-        if (!(context instanceof Activity)) {
-            Log.e(TAG, "Sample SDK requires an Activity context to initialize");
-            listener.onInitializationFailed(
-                    SampleAdapter.this, AdRequest.ERROR_CODE_INVALID_REQUEST);
+    public void initialize(
+            Context context,
+            InitializationCompleteCallback initializationCompleteCallback,
+            List<MediationConfiguration> mediationConfigurations) {
+        if (context == null) {
+            initializationCompleteCallback.onInitializationFailed(
+                    "Initialization Failed: Context is null.");
             return;
         }
 
-        /**
-         * Get the Ad Unit ID for the Sample SDK from serverParameters bundle using the pre
-         * configured key.
-         */
-        String adUnit = serverParameters.getString(SAMPLE_AD_UNIT_KEY);
-        if (TextUtils.isEmpty(adUnit)) {
-            listener.onAdFailedToLoad(this, AdRequest.ERROR_CODE_INVALID_REQUEST);
-            return;
-        }
-
-        // Create a rewarded video event forwarder to forward the events from the Sample SDK to
-        // the Google Mobile Ads SDK.
-        rewardedVideoEventForwarder =
-                new SampleMediationRewardedVideoEventForwarder(listener, SampleAdapter.this);
-
-        // Initialize the Sample SDK.
-        SampleRewardedVideo.initialize((Activity) context, adUnit, rewardedVideoEventForwarder);
+        initializationCompleteCallback.onInitializationSucceeded();
     }
 
     @Override
-    public void loadAd(MediationAdRequest mediationAdRequest,
-                       Bundle serverParameters,
-                       Bundle mediationExtras) {
-        if (SampleRewardedVideo.isAdAvailable()) {
-            // Ad already available, use the forwarder to send a success callback to AdMob.
-            rewardedVideoEventForwarder.onAdLoaded();
-        } else {
-            // No ad available, use the forwarder to send a failure callback.
-            rewardedVideoEventForwarder.onAdFailedToLoad();
+    public VersionInfo getVersionInfo() {
+        String versionString = BuildConfig.VERSION_NAME;
+        String[] splits = versionString.split("\\.");
+
+        if (splits.length >= 4) {
+          int major = Integer.parseInt(splits[0]);
+          int minor = Integer.parseInt(splits[1]);
+          int micro = Integer.parseInt(splits[2]) * 100 + Integer.parseInt(splits[3]);
+          return new VersionInfo(major, minor, micro);
         }
+
+        return new VersionInfo(0, 0, 0);
     }
 
     @Override
-    public void showVideo() {
-        // Show the rewarded video ad.
-        if (SampleRewardedVideo.isAdAvailable()) {
-            // Rewarded video ad available, show ad.
-            SampleRewardedVideo.showAd();
-        } else {
-            // Show ad will only be called if the adapter sends back an ad loaded callback in
-            // response to a loadAd request. If for any reason the adapter is not ready to show
-            // an ad after sending an ad loaded callback, log a warning.
-            Log.w(TAG, "No ads to show.");
+    public VersionInfo getSDKVersionInfo() {
+        String versionString = SampleAdRequest.getSDKVersion();
+        String[] splits = versionString.split("\\.");
+
+        if (splits.length >= 3) {
+            int major = Integer.parseInt(splits[0]);
+            int minor = Integer.parseInt(splits[1]);
+            int micro = Integer.parseInt(splits[2]);
+            return new VersionInfo(major, minor, micro);
         }
+
+        return new VersionInfo(0, 0, 0);
     }
 
     @Override
-    public boolean isInitialized() {
-        return rewardedVideoEventForwarder != null && rewardedVideoEventForwarder.isInitialized();
-    }
-
-    @Override
-    public void onContextChanged(Context context) {
-        if (context instanceof Activity) {
-            SampleRewardedVideo.setCurrentActivity((Activity) context);
-        }
+    public void loadRewardedAd(
+            MediationRewardedAdConfiguration mediationRewardedAdConfiguration,
+            MediationAdLoadCallback<MediationRewardedAd, MediationRewardedAdCallback>
+                    mediationAdLoadCallback) {
+        SampleMediationRewardedAdEventLoader forwarder = new
+                SampleMediationRewardedAdEventLoader(
+                        mediationRewardedAdConfiguration, mediationAdLoadCallback);
+        forwarder.load();
     }
 
     /**

@@ -18,7 +18,10 @@ import com.google.android.gms.ads.mediation.MediationBannerAd;
 import com.google.android.gms.ads.mediation.MediationBannerAdCallback;
 import com.google.android.gms.ads.mediation.MediationBannerAdConfiguration;
 
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.ERROR_INVALID_REQUEST;
 import static com.google.ads.mediation.facebook.FacebookMediationAdapter.TAG;
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.createAdapterError;
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.setMixedAudience;
 
 public class FacebookRtbBannerAd implements MediationBannerAd, AdListener {
 
@@ -28,8 +31,7 @@ public class FacebookRtbBannerAd implements MediationBannerAd, AdListener {
     private MediationBannerAdCallback mBannerAdCallback;
 
     public FacebookRtbBannerAd(MediationBannerAdConfiguration adConfiguration,
-                               MediationAdLoadCallback<MediationBannerAd,
-                                       MediationBannerAdCallback> callback) {
+            MediationAdLoadCallback<MediationBannerAd, MediationBannerAdCallback> callback) {
         this.adConfiguration = adConfiguration;
         this.callback = callback;
     }
@@ -38,20 +40,26 @@ public class FacebookRtbBannerAd implements MediationBannerAd, AdListener {
         Bundle serverParameters = adConfiguration.getServerParameters();
         String placementID = FacebookMediationAdapter.getPlacementID(serverParameters);
         if (TextUtils.isEmpty(placementID)) {
-            String message = "Failed to request ad, placementID is null or empty.";
-            Log.e(TAG, message);
-            callback.onFailure(message);
+            String errorMessage = createAdapterError(ERROR_INVALID_REQUEST,
+                    "Failed to request ad, placementID is null or empty.");
+            Log.e(TAG, errorMessage);
+            callback.onFailure(errorMessage);
             return;
         }
+        setMixedAudience(adConfiguration);
         try {
             adView = new AdView(adConfiguration.getContext(), placementID,
                     adConfiguration.getBidResponse());
-            adView.setAdListener(this);
             if (!TextUtils.isEmpty(adConfiguration.getWatermark())) {
                 adView.setExtraHints(new ExtraHints.Builder()
                         .mediationData(adConfiguration.getWatermark()).build());
             }
-            adView.loadAdFromBid(adConfiguration.getBidResponse());
+            adView.loadAd(
+                    adView.buildLoadAdConfig()
+                            .withAdListener(this)
+                            .withBid(adConfiguration.getBidResponse())
+                            .build()
+            );
         } catch (Exception e) {
             callback.onFailure("FacebookRtbBannerAd Failed to load: " + e.getMessage());
         }

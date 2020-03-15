@@ -18,7 +18,10 @@ import com.google.android.gms.ads.mediation.MediationInterstitialAdConfiguration
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.ERROR_INVALID_REQUEST;
 import static com.google.ads.mediation.facebook.FacebookMediationAdapter.TAG;
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.createAdapterError;
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.setMixedAudience;
 
 public class FacebookRtbInterstitialAd implements MediationInterstitialAd,
         InterstitialAdExtendedListener {
@@ -29,8 +32,8 @@ public class FacebookRtbInterstitialAd implements MediationInterstitialAd,
     private AtomicBoolean didInterstitialAdClose = new AtomicBoolean();
 
     public FacebookRtbInterstitialAd(MediationInterstitialAdConfiguration adConfiguration,
-                                     MediationAdLoadCallback<MediationInterstitialAd,
-                                             MediationInterstitialAdCallback> callback) {
+           MediationAdLoadCallback<MediationInterstitialAd, MediationInterstitialAdCallback>
+                   callback) {
         this.adConfiguration = adConfiguration;
         this.callback = callback;
     }
@@ -39,18 +42,23 @@ public class FacebookRtbInterstitialAd implements MediationInterstitialAd,
         Bundle serverParameters = adConfiguration.getServerParameters();
         String placementID = FacebookMediationAdapter.getPlacementID(serverParameters);
         if (TextUtils.isEmpty(placementID)) {
-            String message = "Failed to request ad, placementID is null or empty.";
-            Log.e(TAG, message);
-            callback.onFailure(message);
+            String ErrorMessage = createAdapterError(ERROR_INVALID_REQUEST,
+                    "Failed to request ad, placementID is null or empty.");
+            Log.e(TAG, ErrorMessage);
+            callback.onFailure(ErrorMessage);
             return;
         }
+        setMixedAudience(adConfiguration);
         interstitialAd = new InterstitialAd(adConfiguration.getContext(), placementID);
-        interstitialAd.setAdListener(this);
         if (!TextUtils.isEmpty(adConfiguration.getWatermark())) {
             interstitialAd.setExtraHints(new ExtraHints.Builder()
                     .mediationData(adConfiguration.getWatermark()).build());
         }
-        interstitialAd.loadAdFromBid(adConfiguration.getBidResponse());
+        interstitialAd.loadAd(
+                interstitialAd.buildLoadAdConfig()
+                        .withBid(adConfiguration.getBidResponse())
+                        .withAdListener(this)
+                        .build());
     }
 
     @Override

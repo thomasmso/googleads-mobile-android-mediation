@@ -17,8 +17,11 @@ import com.google.android.gms.ads.mediation.MediationRewardedAdConfiguration;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.ERROR_INVALID_REQUEST;
 import static com.google.ads.mediation.facebook.FacebookMediationAdapter.TAG;
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.createAdapterError;
 import static com.google.ads.mediation.facebook.FacebookMediationAdapter.getPlacementID;
+import static com.google.ads.mediation.facebook.FacebookMediationAdapter.setMixedAudience;
 
 public class FacebookRewardedAd implements MediationRewardedAd, RewardedVideoAdExtendedListener {
 
@@ -41,8 +44,7 @@ public class FacebookRewardedAd implements MediationRewardedAd, RewardedVideoAdE
     private AtomicBoolean didRewardedAdClose = new AtomicBoolean();
 
     public FacebookRewardedAd(MediationRewardedAdConfiguration adConfiguration,
-                              MediationAdLoadCallback<MediationRewardedAd,
-                                      MediationRewardedAdCallback> callback) {
+            MediationAdLoadCallback<MediationRewardedAd, MediationRewardedAdCallback> callback) {
         this.adConfiguration = adConfiguration;
         this.mMediationAdLoadCallback = callback;
     }
@@ -53,7 +55,8 @@ public class FacebookRewardedAd implements MediationRewardedAd, RewardedVideoAdE
         final String placementID = getPlacementID(serverParameters);
 
         if (TextUtils.isEmpty(placementID)) {
-            String message = "Failed to request ad, placementID is null or empty.";
+            String message = createAdapterError(ERROR_INVALID_REQUEST,
+                    "Failed to request ad, placementID is null or empty.");
             Log.e(TAG, message);
             mMediationAdLoadCallback.onFailure(message);
             return;
@@ -64,14 +67,20 @@ public class FacebookRewardedAd implements MediationRewardedAd, RewardedVideoAdE
             isRtbAd = true;
         }
 
+        setMixedAudience(adConfiguration);
+
         if (isRtbAd) {
             rewardedAd = new RewardedVideoAd(context, placementID);
-            rewardedAd.setAdListener(this);
             if (!TextUtils.isEmpty(adConfiguration.getWatermark())) {
                 rewardedAd.setExtraHints(new ExtraHints.Builder()
                         .mediationData(adConfiguration.getWatermark()).build());
             }
-            rewardedAd.loadAdFromBid(decodedBid);
+            rewardedAd.loadAd(
+                    rewardedAd.buildLoadAdConfig()
+                            .withAdListener(this)
+                            .withBid(decodedBid)
+                            .build()
+            );
         } else {
             FacebookInitializer.getInstance().initialize(context, placementID,
                     new FacebookInitializer.Listener() {
@@ -102,15 +111,18 @@ public class FacebookRewardedAd implements MediationRewardedAd, RewardedVideoAdE
             }
         } else {
             if (mRewardedAdCallback != null) {
-                mRewardedAdCallback.onAdFailedToShow("No ads to show");
+                mRewardedAdCallback.onAdFailedToShow("No ads to show.");
             }
         }
     }
 
     private void createAndLoadRewardedVideo(Context context, String placementID) {
         rewardedAd = new RewardedVideoAd(context, placementID);
-        rewardedAd.setAdListener(this);
-        rewardedAd.loadAd(true);
+        rewardedAd.loadAd(
+                rewardedAd.buildLoadAdConfig()
+                        .withAdListener(this)
+                        .build()
+        );
     }
 
     @Override

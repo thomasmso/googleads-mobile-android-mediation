@@ -1,5 +1,41 @@
 ## AppLovin Android Mediation Adapter Changelog
 
+#### Version 9.11.4.0
+- Verified compatibility with AppLovin SDK 9.11.4.
+
+Built and tested with:
+- Google Mobile Ads SDK version 18.3.0.
+- AppLovin SDK version 9.11.4.
+
+#### Version 9.11.2.0
+- Verified compatibility with AppLovin SDK 9.11.2.
+
+Built and tested with:
+- Google Mobile Ads SDK version 18.3.0.
+- AppLovin SDK version 9.11.2.
+
+#### Version 9.11.1.0
+- Verified compatibility with AppLovin SDK 9.11.1.
+
+Built and tested with:
+- Google Mobile Ads SDK version 18.3.0.
+- AppLovin SDK version 9.11.1.
+
+#### Version 9.10.5.0
+- Verified compatibility with AppLovin SDK 9.10.5.
+
+Built and tested with:
+- Google Mobile Ads SDK version 18.3.0.
+- AppLovin SDK version 9.10.5.
+
+#### Version 9.9.1.2
+- Removed all references to AppLovin placement ID.
+- Updated the minimum required Google Mobile Ads SDK version to 18.3.0.
+
+Built and tested with:
+- Google Mobile Ads SDK version 18.3.0.
+- AppLovin SDK version 9.9.1.
+
 #### Version 9.9.1.1
 - Native ads now leverage the unified native ads mediation API.
 

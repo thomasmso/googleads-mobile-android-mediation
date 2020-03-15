@@ -1,6 +1,6 @@
 package com.google.ads.mediation.chartboost;
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -46,32 +46,42 @@ public class ChartboostMediationAdapter extends Adapter implements MediationRewa
     public VersionInfo getVersionInfo() {
         String versionString = BuildConfig.VERSION_NAME;
         String splits[] = versionString.split("\\.");
-        int major = Integer.parseInt(splits[0]);
-        int minor = Integer.parseInt(splits[1]);
-        int micro = Integer.parseInt(splits[2]) * 100 + Integer.parseInt(splits[3]);
-        return new VersionInfo(major, minor, micro);
+
+        if (splits.length >= 4) {
+            int major = Integer.parseInt(splits[0]);
+            int minor = Integer.parseInt(splits[1]);
+            int micro = Integer.parseInt(splits[2]) * 100 + Integer.parseInt(splits[3]);
+            return new VersionInfo(major, minor, micro);
+        }
+
+        String logMessage = String.format("Unexpected adapter version format: %s." +
+                "Returning 0.0.0 for adapter version.", versionString);
+        Log.w(TAG, logMessage);
+        return new VersionInfo(0, 0, 0);
     }
 
     @Override
     public VersionInfo getSDKVersionInfo() {
         String versionString = Chartboost.getSDKVersion();
         String splits[] = versionString.split("\\.");
-        int major = Integer.parseInt(splits[0]);
-        int minor = Integer.parseInt(splits[1]);
-        int micro = Integer.parseInt(splits[2]);
-        return new VersionInfo(major, minor, micro);
+
+        if (splits.length >= 3) {
+            int major = Integer.parseInt(splits[0]);
+            int minor = Integer.parseInt(splits[1]);
+            int micro = Integer.parseInt(splits[2]);
+            return new VersionInfo(major, minor, micro);
+        }
+
+        String logMessage = String.format("Unexpected SDK version format: %s." +
+                "Returning 0.0.0 for SDK version.", versionString);
+        Log.w(TAG, logMessage);
+        return new VersionInfo(0, 0, 0);
     }
 
     @Override
     public void initialize(Context context,
                            InitializationCompleteCallback initializationCompleteCallback,
                            List<MediationConfiguration> mediationConfigurations) {
-        if (!(context instanceof Activity)) {
-            initializationCompleteCallback.onInitializationFailed(
-                    "Chartboost SDK requires an Activity context to initialize");
-            return;
-        }
-
         HashMap<String, Bundle> chartboostConfigs = new HashMap<>();
         for (MediationConfiguration configuration : mediationConfigurations) {
             Bundle params = configuration.getServerParameters();
@@ -126,13 +136,6 @@ public class ChartboostMediationAdapter extends Adapter implements MediationRewa
         final Bundle extras = mediationRewardedAdConfiguration.getMediationExtras();
 
         Context context = mediationRewardedAdConfiguration.getContext();
-        if (!(context instanceof Activity)) {
-            String logMessage = "Failed to request ad from Chartboost: "
-                    + "Chartboost SDK requires an Activity context to initialize.";
-            Log.w(TAG, logMessage);
-            mediationAdLoadCallback.onFailure(logMessage);
-            return;
-        }
 
         mChartboostParams = ChartboostAdapterUtils
                 .createChartboostParams(serverParameters, extras);
